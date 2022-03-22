@@ -4,14 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 public class Graph {
-    public ArrayList<Node> nodes;
+    private ArrayList<Node> nodes;
     public String name;
     public String comment;
+    public int dimension;
     public ArrayList<Integer> optimal_tour;
-    public HashMap<Integer, Integer> id_to_index;
+    private HashMap<Integer, Integer> id_to_index;
 
     public Graph() {
         nodes = new ArrayList<>();
@@ -23,10 +23,14 @@ public class Graph {
         return nodes.get(id_to_index.get(id));
     }
 
+    public void addNode(Node node) {
+        nodes.add(node);
+        id_to_index.put(node.id, nodes.size() - 1);
+    }
+
     static public Graph from_tsplib(String filename) {
         try {
             Graph graph = new Graph();
-            int dimension = 0;
             String edge_weight_type = null;
             // open the file
             BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -61,7 +65,7 @@ public class Graph {
                         break;
                     case "DIMENSION":
                         System.out.println("dimension: " + val);
-                        dimension = Integer.parseInt(val);
+                        graph.dimension = Integer.parseInt(val);
                         break;
                     case "EDGE_WEIGHT_TYPE":
                         System.out.println("edge_weight_type: " + val);
@@ -81,7 +85,7 @@ public class Graph {
                             System.err.println("Error: edge_weight_type not supported");
                             return null;
                         }
-                        for (int i = 0; i < dimension; i++) {
+                        for (int i = 0; i < graph.dimension; i++) {
                             line = reader.readLine();
                             line = line.trim();
                             parts = line.split("\\s+");
@@ -92,28 +96,27 @@ public class Graph {
                             double x = Double.parseDouble(parts[1]);
                             double y = Double.parseDouble(parts[2]);
                             Node node = new Node(id, x, y);
-                            graph.nodes.add(node);
-                            graph.id_to_index.put(id, i);
+                            graph.addNode(node);
                             System.out.println("node: " + node);
                         }
                         break;
                 }
             } while (line != null);
             reader.close();
-            assert (graph.nodes.size() == dimension);
+            assert (graph.nodes.size() == graph.dimension);
             // add edges - the graph is undirected and fully connected
-            for (int i = 0; i < dimension; i++) {
+            for (int i = 0; i < graph.dimension; i++) {
                 Node node = graph.nodes.get(i);
-                for (int j = 0; j < dimension; j++) {
+                for (int j = 0; j < graph.dimension; j++) {
                     if (i == j) {
                         continue;
                     }
                     Node node2 = graph.nodes.get(j);
                     double dist = Math.sqrt(Math.pow(node.x - node2.x, 2) + Math.pow(node.y - node2.y, 2));
                     Edge edge = new Edge(node2.id, node.id, dist);
-                    node.edges.add(edge);
+                    node.add_edge(edge);
                     edge = new Edge(node.id, node2.id, dist);
-                    node2.edges.add(edge);
+                    node2.add_edge(edge);
                 }
             }
             return graph;
@@ -125,18 +128,19 @@ public class Graph {
         }
     }
 
-    static ArrayList<Integer> read_tour(String filename) {
+    public static ArrayList<Integer> read_tour(String filename) {
         try {
             ArrayList<Integer> tour = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String line = reader.readLine();
-            while (line != null) {
+            String line;
+            do {
+                line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
                 line = line.trim();
                 String wsp_reg = "\\s+";
                 String[] parts = line.split(wsp_reg);
-                if (parts.length != 2) {
-                    continue;
-                }
                 String name = parts[0].trim();
                 if (name.equals("TOUR_SECTION")) {
                     // read the tour
@@ -150,6 +154,7 @@ public class Graph {
                         for (int i = 0; i < parts.length; i++) {
                             String val = parts[i].trim();
                             if (val.length() == 0) {
+                                line = reader.readLine();
                                 continue;
                             }
                             int id = Integer.parseInt(val);
@@ -158,15 +163,34 @@ public class Graph {
                             }
                             tour.add(id);
                         }
-                    }
+                        line = reader.readLine();
+                        }
                 }
-                reader.close();
-                return tour;
-            }
+            } while (line != null);
             reader.close();
             return tour;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public double get_tour_length(ArrayList<Integer> tour) {
+        if (tour == null) {
+            if (optimal_tour == null) {
+                // TODO: throw an exception
+                return -1;
+            }
+            tour = optimal_tour;
+        }
+        double length = 0;
+        for (int i = 0; i < tour.size() - 1; i++) {
+            int id1 = tour.get(i);
+            int id2 = tour.get(i + 1);
+            Node node1 = getNode(id1);
+            Node node2 = getNode(id2);
+            Edge edge = node1.get_edge(node2);
+            length += edge.weight;
+        }
+        return length;
     }
 }
