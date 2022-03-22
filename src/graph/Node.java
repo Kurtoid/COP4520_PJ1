@@ -7,12 +7,14 @@ public class Node {
         this.id = id;
         this.x = x;
         this.y = y;
+
+        this.edges = new ArrayList<>();
     }
 
     public int id;
     public ArrayList<Edge> edges;
 
     // not guaranteed to exis
-    public int x;
-    public int y;
+    public double x;
+    public double y;
 }
