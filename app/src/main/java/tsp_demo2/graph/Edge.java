@@ -1,6 +1,6 @@
 package graph;
 
-public class Edge {
+public class Edge implements Comparable<Edge> {
     public Edge(int to, int from, double weight) {
         this.to = to;
         this.from = from;
@@ -13,4 +13,9 @@ public class Edge {
     public double weight;
     // this contains the ID of the node this edge points from, not the index
     public int from;
+
+    @Override
+    public int compareTo(Edge o) {
+        return Double.compare(this.weight, o.weight);
+    }
 }

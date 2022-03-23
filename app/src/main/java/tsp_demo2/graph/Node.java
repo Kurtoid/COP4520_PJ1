@@ -14,9 +14,9 @@ public class Node {
     }
 
     public int id;
-    private ArrayList<Edge> edges;
+    protected ArrayList<Edge> edges;
 
-    private HashMap<Integer, Edge> edge_map;
+    protected HashMap<Integer, Edge> edge_map;
 
     // not guaranteed to exis
     public double x;
@@ -29,6 +29,19 @@ public class Node {
     public void add_edge(Edge edge) {
         edges.add(edge);
         edge_map.put(edge.to, edge);
+    }
+
+    public ArrayList<Edge> get_edges() {
+        return edges;
+    }
+
+    public static Node copy_without_edges(Node orig_node) {
+        Node new_node = new Node(orig_node.id, orig_node.x, orig_node.y);
+        return new_node;
+    }
+
+    public int get_degree() {
+        return edges.size();
     }
 
 }

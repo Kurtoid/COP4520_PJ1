@@ -193,4 +193,27 @@ public class Graph {
         }
         return length;
     }
+
+    public void make_undirected() {
+        // clear the edges, and add them back in
+        for (Node node : nodes) {
+            node.edges.clear();
+            node.edge_map.clear();
+        }
+
+        for (int i = 0; i < dimension; i++) {
+            Node node = nodes.get(i);
+            for (int j = 0; j < dimension; j++) {
+                if (i == j) {
+                    continue;
+                }
+                Node node2 = nodes.get(j);
+                double dist = Math.sqrt(Math.pow(node.x - node2.x, 2) + Math.pow(node.y - node2.y, 2));
+                Edge edge = new Edge(node2.id, node.id, dist);
+                node.add_edge(edge);
+                edge = new Edge(node.id, node2.id, dist);
+                node2.add_edge(edge);
+            }
+        }
+    }
 }
