@@ -1,11 +1,11 @@
-package algorithms.helpers;
+package tsp_demo2.algorithms.helpers;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-import graph.Edge;
-import graph.Graph;
-import graph.Node;
+import tsp_demo2.graph.Edge;
+import tsp_demo2.graph.Graph;
+import tsp_demo2.graph.Node;
 
 public class Prims {
     // while there are unvisited nodes, find the nearest unvisited node

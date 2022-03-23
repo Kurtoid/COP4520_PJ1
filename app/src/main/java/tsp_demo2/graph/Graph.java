@@ -1,4 +1,4 @@
-package graph;
+package tsp_demo2.graph;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

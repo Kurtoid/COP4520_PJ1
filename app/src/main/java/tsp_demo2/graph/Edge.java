@@ -1,4 +1,4 @@
-package graph;
+package tsp_demo2.graph;
 
 public class Edge implements Comparable<Edge> {
     public Edge(int to, int from, double weight) {

@@ -1,8 +1,8 @@
-package algorithms;
+package tsp_demo2.algorithms;
 
 import java.util.ArrayList;
 
-import graph.Graph;
+import tsp_demo2.graph.Graph;
 
 public class GreedyNearest {
     public static ArrayList<Integer> find(Graph g) {

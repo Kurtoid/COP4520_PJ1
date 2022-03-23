@@ -1,8 +1,8 @@
 package tsp_demo2;
 import java.util.ArrayList;
 
-import algorithms.GreedyNearest;
-import graph.Graph;
+import tsp_demo2.algorithms.GreedyNearest;
+import tsp_demo2.graph.Graph;
 
 public class App {
 

@@ -1,7 +1,8 @@
+package tsp_demo2.algorithms;
 import java.util.ArrayList;
 
-import algorithms.helpers.Prims;
-import graph.Graph;
+import tsp_demo2.algorithms.helpers.Prims;
+import tsp_demo2.graph.Graph;
 
 public class Christofides {
     public static ArrayList<Integer> find(Graph g) {
