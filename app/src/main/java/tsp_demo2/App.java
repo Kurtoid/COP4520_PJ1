@@ -4,6 +4,7 @@ import java.util.List;
 
 import tsp_demo2.algorithms.Christofides;
 import tsp_demo2.algorithms.GreedyNearest;
+import tsp_demo2.algorithms.AntColony.SerialAntColony;
 import tsp_demo2.graph.Graph;
 
 public class App {
@@ -19,6 +20,8 @@ public class App {
         System.out.printf("Greedy tour length: %f\n", g.get_tour_length(tour));
         List<Integer> christofides = Christofides.find(g);
         System.out.printf("Christofides tour length: %f\n", g.get_tour_length(christofides));
+        List<Integer> ant_col_tour = SerialAntColony.find(g, 100, 100);
+        System.out.printf("Ant colony tour length: %f\n", g.get_tour_length(ant_col_tour));
 
     }
 }
