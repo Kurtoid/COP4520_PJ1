@@ -16,12 +16,21 @@ public class App {
         g.optimal_tour = Graph.read_tour("solved_graphs/tsp225.opt.tour");
         System.out.printf("Optimal tour length: %f\n", g.get_tour_length(g.optimal_tour));
         // System.out.println(g.optimal_tour);
+
+        long startTime = System.currentTimeMillis();
         List<Integer> tour = GreedyNearest.find(g);
+        System.out.println("GreedyNearest: " + (System.currentTimeMillis() - startTime) + "ms");
         System.out.printf("Greedy tour length: %f\n", g.get_tour_length(tour));
+
+        startTime = System.currentTimeMillis();
         List<Integer> christofides = Christofides.find(g);
+        System.out.println("Christofides (JGraphT): " + (System.currentTimeMillis() - startTime) + "ms");
         System.out.printf("Christofides tour length: %f\n", g.get_tour_length(christofides));
         // turns we don't need a lot of ants or iterations to get a good result
+
+        startTime = System.currentTimeMillis();
         List<Integer> ant_col_tour = SerialAntColony.find(g, 10, 10);
+        System.out.println("AntColony: " + (System.currentTimeMillis() - startTime) + "ms");
         System.out.printf("Ant colony tour length: %f\n", g.get_tour_length(ant_col_tour));
 
     }
