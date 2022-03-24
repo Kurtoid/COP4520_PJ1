@@ -162,6 +162,9 @@ public class Graph {
                                 line = reader.readLine();
                                 continue;
                             }
+                            if (val.equals("EOF")) {
+                                break;
+                            }
                             int id = Integer.parseInt(val);
                             if (id == -1) {
                                 break;
