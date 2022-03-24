@@ -20,7 +20,9 @@ public class Edge implements Comparable<Edge> {
     }
 
     public boolean equals(Edge e) {
-        return this.to == e.to && this.from == e.from;
+        // return this.to == e.to && this.from == e.from;
+        // handle undirected equality
+        return (this.to == e.to && this.from == e.from) || (this.to == e.from && this.from == e.to);
     }
 
     // hash to and from

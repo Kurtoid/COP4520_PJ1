@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.util.SupplierUtil;
 
 public class Graph {
     private ArrayList<Node> nodes;
@@ -31,6 +33,8 @@ public class Graph {
         }
         nodes.add(node);
         id_to_index.put(node.id, nodes.size() - 1);
+        // TODO: this is a hack - actually fix this
+        dimension = Math.max(dimension, nodes.size());
     }
 
     static public Graph from_tsplib(String filename) {
@@ -102,7 +106,7 @@ public class Graph {
                             double y = Double.parseDouble(parts[2]);
                             Node node = new Node(id, x, y);
                             graph.addNode(node);
-                            System.out.println("node: " + node);
+                            // System.out.println("node: " + node);
                         }
                         break;
                 }
@@ -172,12 +176,14 @@ public class Graph {
                             tour.add(id);
                         }
                         line = reader.readLine();
-                        }
+                    }
                 }
             } while (line != null);
             reader.close();
             return tour;
         } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -199,6 +205,15 @@ public class Graph {
             Edge edge = node1.get_edge(node2);
             length += edge.weight;
         }
+        // add the last edge, if not already added
+        if (tour.get(0) != tour.get(tour.size() - 1)) {
+            int id1 = tour.get(tour.size() - 1);
+            int id2 = tour.get(0);
+            Node node1 = getNode(id1);
+            Node node2 = getNode(id2);
+            Edge edge = node1.get_edge(node2);
+            length += edge.weight;
+        }
         return length;
     }
 
@@ -209,9 +224,9 @@ public class Graph {
             node.edge_map.clear();
         }
 
-        for (int i = 0; i < dimension; i++) {
+        for (int i = 0; i < nodes.size(); i++) {
             Node node = nodes.get(i);
-            for (int j = 0; j < dimension; j++) {
+            for (int j = 0; j < nodes.size(); j++) {
                 if (i == j) {
                     continue;
                 }
@@ -225,17 +240,40 @@ public class Graph {
         }
     }
 
-    public SimpleWeightedGraph<Node, Edge> to_JGraphT() {
-        SimpleWeightedGraph<Node, Edge> new_graph = new SimpleWeightedGraph<>(Edge.class);
+    public SimpleWeightedGraph<Integer, DefaultWeightedEdge> to_JGraphT() {
+        SimpleWeightedGraph<Integer, DefaultWeightedEdge> new_graph = new SimpleWeightedGraph<>(
+                DefaultWeightedEdge.class);
+        new_graph.setEdgeSupplier(SupplierUtil.createDefaultWeightedEdgeSupplier());
+        new_graph.setVertexSupplier(SupplierUtil.createIntegerSupplier());
         for (Node node : nodes) {
-            new_graph.addVertex(node);
+            new_graph.addVertex(node.id);
         }
         for (Node node : nodes) {
             for (Edge edge : node.edges) {
-                Node to_node = getNode(edge.to);
-                new_graph.addEdge(node, to_node);
+                DefaultWeightedEdge added_edge = new_graph.addEdge(node.id, edge.to);
+                if (added_edge == null) {
+                    continue;
+                }
+                new_graph.setEdgeWeight(added_edge, edge.weight);
             }
         }
+        // System.out.println("new_graph: " + new_graph);
         return new_graph;
+    }
+
+    // only adds one direction!
+    // if working on an undirected graph, make sure
+    // to add the reverse edge as well
+    // (or call make_undirected() after)
+    public void addEdge(Edge edge) {
+        Node from_node = getNode(edge.from);
+        from_node.add_edge(edge);
+    }
+
+    @Override
+    public String toString() {
+        return "Graph{" +
+                "dimension=" + dimension +
+                '}';
     }
 }

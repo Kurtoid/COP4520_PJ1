@@ -27,6 +27,9 @@ public class Node {
     }
 
     public void add_edge(Edge edge) {
+        if (edges.contains(edge)) {
+            return;
+        }
         edges.add(edge);
         edge_map.put(edge.to, edge);
     }
