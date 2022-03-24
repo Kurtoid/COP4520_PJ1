@@ -194,14 +194,14 @@ public class Graph {
             length += edge.weight;
         }
         // add the last edge, if not already added
-        if (tour.get(0) != tour.get(tour.size() - 1)) {
-            int id1 = tour.get(tour.size() - 1);
-            int id2 = tour.get(0);
-            Node node1 = getNode(id1);
-            Node node2 = getNode(id2);
-            Edge edge = node1.get_edge(node2);
-            length += edge.weight;
-        }
+        // if (tour.get(0) != tour.get(tour.size() - 1)) {
+        // int id1 = tour.get(tour.size() - 1);
+        // int id2 = tour.get(0);
+        // Node node1 = getNode(id1);
+        // Node node2 = getNode(id2);
+        // Edge edge = node1.get_edge(node2);
+        // length += edge.weight;
+        // }
         return length;
     }
 

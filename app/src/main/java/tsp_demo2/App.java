@@ -4,6 +4,7 @@ import java.util.List;
 
 import tsp_demo2.algorithms.Christofides;
 import tsp_demo2.algorithms.GreedyNearest;
+import tsp_demo2.algorithms.AntColony.ParallelAntColony;
 import tsp_demo2.algorithms.AntColony.SerialAntColony;
 import tsp_demo2.graph.Graph;
 
@@ -24,12 +25,19 @@ public class App {
 
         startTime = System.currentTimeMillis();
         List<Integer> christofides = Christofides.find(g);
-        System.out.println("Christofides (JGraphT): " + (System.currentTimeMillis() - startTime) + "ms");
-        System.out.printf("Christofides tour length: %f\n", g.get_tour_length(christofides));
-        // turns we don't need a lot of ants or iterations to get a good result
+        System.out.println("Christofides (JGraphT): " + (System.currentTimeMillis() -
+                startTime) + "ms");
+        System.out.printf("Christofides tour length: %f\n",
+                g.get_tour_length(christofides));
 
         startTime = System.currentTimeMillis();
-        List<Integer> ant_col_tour = SerialAntColony.find(g, 10, 10);
+        List<Integer> parallelAntColony = ParallelAntColony.find(g, 5, 5);
+        System.out.println("AntColony (Parallel): " + (System.currentTimeMillis() - startTime) + "ms");
+        System.out.printf("AntColony tour length: %f\n", g.get_tour_length(parallelAntColony));
+
+        // turns we don't need a lot of ants or iterations to get a good result
+        startTime = System.currentTimeMillis();
+        List<Integer> ant_col_tour = SerialAntColony.find(g, 5, 5);
         System.out.println("AntColony: " + (System.currentTimeMillis() - startTime) + "ms");
         System.out.printf("Ant colony tour length: %f\n", g.get_tour_length(ant_col_tour));
 
