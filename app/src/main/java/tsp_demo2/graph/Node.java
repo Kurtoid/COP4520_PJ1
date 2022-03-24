@@ -44,4 +44,11 @@ public class Node {
         return edges.size();
     }
 
+    public boolean equals(Node node) {
+        return this.id == node.id;
+    }
+
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
 }

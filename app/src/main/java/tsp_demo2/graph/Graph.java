@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jgrapht.graph.SimpleWeightedGraph;
+
 public class Graph {
     private ArrayList<Node> nodes;
     public String name;
@@ -24,6 +26,9 @@ public class Graph {
     }
 
     public void addNode(Node node) {
+        if (nodes.contains(node)) {
+            return;
+        }
         nodes.add(node);
         id_to_index.put(node.id, nodes.size() - 1);
     }
@@ -215,5 +220,19 @@ public class Graph {
                 node2.add_edge(edge);
             }
         }
+    }
+
+    public SimpleWeightedGraph<Node, Edge> to_JGraphT() {
+        SimpleWeightedGraph<Node, Edge> new_graph = new SimpleWeightedGraph<>(Edge.class);
+        for (Node node : nodes) {
+            new_graph.addVertex(node);
+        }
+        for (Node node : nodes) {
+            for (Edge edge : node.edges) {
+                Node to_node = getNode(edge.to);
+                new_graph.addEdge(node, to_node);
+            }
+        }
+        return new_graph;
     }
 }

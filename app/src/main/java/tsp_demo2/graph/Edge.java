@@ -18,4 +18,13 @@ public class Edge implements Comparable<Edge> {
     public int compareTo(Edge o) {
         return Double.compare(this.weight, o.weight);
     }
+
+    public boolean equals(Edge e) {
+        return this.to == e.to && this.from == e.from;
+    }
+
+    // hash to and from
+    public int hashCode() {
+        return 31 * Integer.hashCode(to) + Integer.hashCode(from);
+    }
 }
