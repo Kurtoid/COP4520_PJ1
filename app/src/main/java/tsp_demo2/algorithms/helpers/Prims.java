@@ -1,9 +1,7 @@
 package tsp_demo2.algorithms.helpers;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 import tsp_demo2.graph.Edge;
@@ -43,9 +41,10 @@ public class Prims {
                 return null;
             }
             Node orig_node = g.getNode(nearest_edge.to);
+            edges.addAll(orig_node.get_edges());
             Node new_node = mst.getNode(nearest_edge.to);
             visited.add(new_node);
-            edges.addAll(orig_node.get_edges());
+
             Edge new_edge = new Edge(nearest_edge.from, nearest_edge.to, nearest_edge.weight);
             mst.addEdge(new_edge);
             // add the reverse edge

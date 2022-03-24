@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -114,20 +115,7 @@ public class Graph {
             reader.close();
             assert (graph.nodes.size() == graph.dimension);
             // add edges - the graph is undirected and fully connected
-            for (int i = 0; i < graph.dimension; i++) {
-                Node node = graph.nodes.get(i);
-                for (int j = 0; j < graph.dimension; j++) {
-                    if (i == j) {
-                        continue;
-                    }
-                    Node node2 = graph.nodes.get(j);
-                    double dist = Math.sqrt(Math.pow(node.x - node2.x, 2) + Math.pow(node.y - node2.y, 2));
-                    Edge edge = new Edge(node2.id, node.id, dist);
-                    node.add_edge(edge);
-                    edge = new Edge(node.id, node2.id, dist);
-                    node2.add_edge(edge);
-                }
-            }
+            graph.make_undirected();
             return graph;
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
@@ -188,7 +176,7 @@ public class Graph {
         }
     }
 
-    public double get_tour_length(ArrayList<Integer> tour) {
+    public double get_tour_length(List<Integer> tour) {
         if (tour == null) {
             if (optimal_tour == null) {
                 // TODO: throw an exception
@@ -234,8 +222,6 @@ public class Graph {
                 double dist = Math.sqrt(Math.pow(node.x - node2.x, 2) + Math.pow(node.y - node2.y, 2));
                 Edge edge = new Edge(node2.id, node.id, dist);
                 node.add_edge(edge);
-                edge = new Edge(node.id, node2.id, dist);
-                node2.add_edge(edge);
             }
         }
     }

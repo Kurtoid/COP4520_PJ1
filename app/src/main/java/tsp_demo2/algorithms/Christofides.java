@@ -2,7 +2,18 @@ package tsp_demo2.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.checkerframework.checker.units.qual.A;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.cycle.HierholzerEulerianCycle;
+import org.jgrapht.alg.tour.ChristofidesThreeHalvesApproxMetricTSP;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.graph.WeightedMultigraph;
+import org.jgrapht.util.SupplierUtil;
 
 import tsp_demo2.algorithms.helpers.Blossom;
 import tsp_demo2.algorithms.helpers.Prims;
@@ -11,11 +22,21 @@ import tsp_demo2.graph.Graph;
 import tsp_demo2.graph.Node;
 
 public class Christofides {
-    public static ArrayList<Integer> find(Graph g) {
+    public static List<Integer> find(Graph g) {
+        // convert graph to a JGraphT graph
+        // run blossom on it
+        // convert it back to our graph representation
+        SimpleWeightedGraph<Integer, DefaultWeightedEdge> jgrapht_graph = g.to_JGraphT();
+        ChristofidesThreeHalvesApproxMetricTSP<Integer, DefaultWeightedEdge> christofides = new ChristofidesThreeHalvesApproxMetricTSP<>();
+        GraphPath<Integer, DefaultWeightedEdge> tour = christofides.getTour(jgrapht_graph);
+        return tour.getVertexList();
+    }
+
+    public static ArrayList<Integer> find_not_yet_working(Graph g) {
         // 1. Find the minimum spanning tree
         // 2. find O = set of odd degree vertices
         // 3. find minumum weight perfect matching M given by vertices in O
-        // 4. combine edges of M and T to form H
+        // 4. combine edges of M and T to form multigraph H
         // 5. form a circut from H
         // 6. remove repeated vertices
 
@@ -51,18 +72,64 @@ public class Christofides {
         // 3. find minumum weight perfect matching M given by vertices in O
         // using Blossom algorithm
         ArrayList<Edge> matched_edges = Blossom.find(subgraph);
+        System.out.println("found " + matched_edges.size() + " edges");
+        int num_edges_in_mst = 0;
+        for (int i = 1; i <= mst.dimension; i++) {
+            num_edges_in_mst += mst.getNode(i).get_edges().size();
+        }
+        System.out.println("num edges in mst: " + num_edges_in_mst);
 
         // 4. combine edges of M and T to form H
-        // add the edges from matching to the mst
-        for (Edge edge : matched_edges) {
-            mst.addEdge(edge);
-            // add the reverse edge
-            Edge reverse_edge = new Edge(edge.from, edge.to, edge.weight);
-            mst.addEdge(reverse_edge);
+        // NOTE: this is a multigraph!
+        // our current graph structure doesn't support multigraphs, so we'll use
+        // WeightedMultigraph
+
+        // it's very important that we don't allow duplicate edges from MST, but allow
+        // duplicate edges from matches
+        // SimpleWeightedGraph<Integer, DefaultWeightedEdge> mst_jgrapht =
+        // mst.to_JGraphT();
+        WeightedMultigraph<Integer, DefaultWeightedEdge> H = new WeightedMultigraph<>(
+                DefaultWeightedEdge.class);
+        H.setEdgeSupplier(SupplierUtil.createDefaultWeightedEdgeSupplier());
+        // add nodes
+        for (int i = 1; i <= mst.dimension; i++) {
+            H.addVertex(i);
         }
+        // add edges from mst
+        // disallow duplicate edges
+        int mst_added_edges = 0;
+        for (int i = 1; i <= mst.dimension; i++) {
+            for (Edge edge : mst.getNode(i).get_edges()) {
+                // make sure we don't add duplicate edges
+                if (!H.containsEdge(i, edge.to)) {
+                    DefaultWeightedEdge jgrapht_edge = H.addEdge(i, edge.to);
+                    H.setEdgeWeight(jgrapht_edge, edge.weight);
+                    mst_added_edges++;
+                }
+            }
+        }
+        System.out.println("added " + mst_added_edges + " edges from mst");
+        // add edges from matched edges
+        // allow duplicate edges
+        int matched_added_edges = 0;
+        for (Edge edge : matched_edges) {
+            DefaultWeightedEdge jgrapht_edge = H.addEdge(edge.from, edge.to);
+            H.setEdgeWeight(jgrapht_edge, edge.weight);
+            matched_added_edges++;
+        }
+        System.out.println("added " + matched_added_edges + " edges from matched edges");
+        // make sure num edges in H == matched_added_edges + mst_added_edges
+        assert H.edgeSet().size() == matched_added_edges + mst_added_edges;
 
         // 5. form a circut from H
-        ArrayList<Integer> tour = euler_tour(mst);
+        HierholzerEulerianCycle<Integer, DefaultWeightedEdge> cycle = new HierholzerEulerianCycle<>();
+        GraphPath<Integer, DefaultWeightedEdge> path = cycle.getEulerianCycle(H);
+        // System.out.println("cycle: " + path.toString());
+
+        ArrayList<Integer> tour = new ArrayList<>();
+        for (Integer node_id : path.getVertexList()) {
+            tour.add(node_id);
+        }
         System.out.println("tour: " + tour.size());
 
         // 6. remove repeated vertices
@@ -83,6 +150,20 @@ public class Christofides {
         ArrayList<Integer> cpath = new ArrayList<>();
         // final tour:
         ArrayList<Integer> epath = new ArrayList<>();
+
+        // multigraph sanity check: are there edges in the graph with duplicate hashes?
+        Set<Edge> all_edges = new HashSet<>();
+        for (int i = 1; i <= g.dimension; i++) {
+            for (Edge edge : g.getNode(i).get_edges()) {
+                if (all_edges.contains(edge)) {
+                    System.out.println("ERROR: duplicate edge detected");
+                    System.out.println(edge.toString());
+                    System.exit(1);
+                }
+                all_edges.add(edge);
+            }
+        }
+        System.out.println("known edges: " + all_edges.size());
 
         Set<Edge> visited = new HashSet<>();
         Node start = g.getNode(1);

@@ -27,6 +27,14 @@ public class Edge implements Comparable<Edge> {
 
     // hash to and from
     public int hashCode() {
-        return 31 * Integer.hashCode(to) + Integer.hashCode(from);
+        int to = this.to;
+        int from = this.from;
+        // handle undirected equality
+        if (to > from) {
+            int temp = to;
+            to = from;
+            from = temp;
+        }
+        return Integer.hashCode(to) * 31 + Integer.hashCode(from);
     }
 }

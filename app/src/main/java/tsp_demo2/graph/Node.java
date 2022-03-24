@@ -44,7 +44,8 @@ public class Node {
     }
 
     public int get_degree() {
-        return edges.size();
+        // get unique edges
+        return edge_map.size();
     }
 
     public boolean equals(Node node) {
