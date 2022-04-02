@@ -15,6 +15,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.graph.WeightedMultigraph;
 import org.jgrapht.util.SupplierUtil;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.algorithms.helpers.Blossom;
 import tsp_demo2.algorithms.helpers.Prims;
 import tsp_demo2.graph.Edge;
@@ -22,14 +23,16 @@ import tsp_demo2.graph.Graph;
 import tsp_demo2.graph.Node;
 
 public class Christofides {
-    public static List<Integer> find(Graph g) {
+    public static PathResult find(Graph g) {
         // convert graph to a JGraphT graph
         // run blossom on it
         // convert it back to our graph representation
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> jgrapht_graph = g.to_JGraphT();
+        long start = System.currentTimeMillis();
         ChristofidesThreeHalvesApproxMetricTSP<Integer, DefaultWeightedEdge> christofides = new ChristofidesThreeHalvesApproxMetricTSP<>();
+        long elapsed = System.currentTimeMillis() - start;
         GraphPath<Integer, DefaultWeightedEdge> tour = christofides.getTour(jgrapht_graph);
-        return tour.getVertexList();
+        return new PathResult(new ArrayList<Integer>(tour.getVertexList()), elapsed);
     }
 
     public static ArrayList<Integer> find_not_yet_working(Graph g) {

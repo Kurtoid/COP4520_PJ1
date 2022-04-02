@@ -2,10 +2,12 @@ package tsp_demo2.algorithms;
 
 import java.util.ArrayList;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.graph.Graph;
 
 public class GreedyNearest {
-    public static ArrayList<Integer> find(Graph g) {
+    public static PathResult find(Graph g) {
+        long start = System.currentTimeMillis();
         ArrayList<Integer> tour = new ArrayList<>();
         ArrayList<Integer> unvisited = new ArrayList<>();
         // node ids are 1-indexed!
@@ -30,7 +32,11 @@ public class GreedyNearest {
             unvisited.remove(new Integer(nearest_node));
             current_node = nearest_node;
         }
-        return tour;
+        // add the first node to the end of the tour
+        tour.add(1);
+        long elapsed = System.currentTimeMillis() - start;
+        PathResult result = new PathResult(tour, elapsed);
+        return result;
 
     }
 }

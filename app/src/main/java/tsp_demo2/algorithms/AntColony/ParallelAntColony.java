@@ -6,14 +6,16 @@ import java.util.Set;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.graph.Graph;
 
 public class ParallelAntColony {
-    public static ArrayList<Integer> find(Graph g, int num_ants, int num_iterations) {
+    public static PathResult find(Graph g, int num_ants, int num_iterations) {
         g.make_undirected();
         int dimension = g.dimension;
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> graph = g.to_JGraphT();
         g = null;
+        long start = System.currentTimeMillis();
 
         ArrayList<Double> ph_score = new ArrayList<>();
         for (int i = 0; i < dimension; i++) {
@@ -55,9 +57,10 @@ public class ParallelAntColony {
                 double new_ph = ph + 1.0 / best_tour_length;
                 ph_score.set(node - 1, new_ph);
             }
-            System.out.println("Iteration " + i + ": " + best_tour_length);
+            // System.out.println("Iteration " + i + ": " + best_tour_length);
         }
-        return best_tour;
+        long elapsed = System.currentTimeMillis() - start;
+        return new PathResult(best_tour, elapsed);
 
     }
 
@@ -110,6 +113,9 @@ public class ParallelAntColony {
                 // update distance traveled
                 tour_length += chosen_dist;
             }
+            // add the edge from the last node to the first node
+            tour_length += graph.getEdgeWeight(graph.getEdge(tour.get(tour.size() - 1), tour.get(0)));
+
         }
 
         static double dist_weight = 0.5;

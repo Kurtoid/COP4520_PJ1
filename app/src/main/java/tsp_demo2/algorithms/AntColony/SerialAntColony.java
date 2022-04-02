@@ -9,16 +9,18 @@ import org.checkerframework.checker.units.qual.A;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.graph.Graph;
 
 public class SerialAntColony {
 
-    public static ArrayList<Integer> find(Graph g, int n_ants, int iterations) {
+    public static PathResult find(Graph g, int n_ants, int iterations) {
         g.make_undirected();
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> graph = g.to_JGraphT();
         int dimension = g.dimension;
         // don't use g
         g = null;
+        long start = System.currentTimeMillis();
         ArrayList<Integer> tour = new ArrayList<>();
         double shortest_tour_length = Double.MAX_VALUE;
         ArrayList<Double> ph_score = new ArrayList<>();
@@ -85,9 +87,11 @@ public class SerialAntColony {
                 double new_ph = ph + 1.0 / shortest_tour_length;
                 ph_score.set(node - 1, new_ph);
             }
-            System.out.println("iteration " + i + ": " + shortest_tour_length);
+            // System.out.println("iteration " + i + ": " + shortest_tour_length);
         }
-        return tour;
+        long elapsed = System.currentTimeMillis() - start;
+        PathResult result = new PathResult(tour, elapsed);
+        return result;
     }
 
     static double dist_weight = 0.5;

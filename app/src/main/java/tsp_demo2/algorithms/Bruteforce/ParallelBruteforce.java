@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.graph.Graph;
 
 public class ParallelBruteforce {
@@ -80,9 +81,16 @@ public class ParallelBruteforce {
                         DefaultWeightedEdge edge = g.getEdge(node1, node2);
                         tour_length += g.getEdgeWeight(edge);
                     }
+                    // add the distance for the return home
+                    int node1 = current_permutation.get(graph_size - 1);
+                    int node2 = current_permutation.get(0);
+                    DefaultWeightedEdge edge = g.getEdge(node1, node2);
+                    tour_length += g.getEdgeWeight(edge);
                     if (tour_length < min_path_length) {
                         min_path_length = (int) tour_length;
                         best_tour = (ArrayList<Integer>) current_permutation.clone();
+                        // add the edge from the last node to the first node
+                        best_tour.add(best_tour.get(0));
                     }
                 }
                 // System.out.println("Thread " + this.getId() + " finished with " +
@@ -94,13 +102,12 @@ public class ParallelBruteforce {
         }
     }
 
-    public static ArrayList<Integer> find(Graph g) {
+    public static PathResult find(Graph g, int num_threads) {
         g.make_undirected();
         int dimension = g.dimension;
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> graph = g.to_JGraphT();
         g = null;
-
-        int num_threads = 4;
+        long start = System.currentTimeMillis();
         int num_permutations = CachedFactorial.instance.factorial(dimension);
         // split the permutations into num_threads parts
         int part_size = num_permutations / num_threads;
@@ -138,7 +145,8 @@ public class ParallelBruteforce {
                 best_tour_length = thread.min_path_length;
             }
         }
-        return best_tour;
+        long elapsed = System.currentTimeMillis() - start;
+        return new PathResult(best_tour, elapsed);
     }
 
     // efficiently generate nth permutation of [0, 1, ..., n-1]

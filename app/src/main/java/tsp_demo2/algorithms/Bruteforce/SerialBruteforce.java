@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import tsp_demo2.PathResult;
 import tsp_demo2.graph.Graph;
 
 public class SerialBruteforce {
-    public static ArrayList<Integer> find(Graph g) {
+    public static PathResult find(Graph g) {
         g.make_undirected();
         int dimension = g.dimension;
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> graph = g.to_JGraphT();
         g = null;
-
+        long start = System.currentTimeMillis();
         ArrayList<Integer> current_permutation = new ArrayList<>();
         ArrayList<Integer> best_tour = null;
         double best_tour_length = Double.MAX_VALUE;
@@ -28,20 +29,24 @@ public class SerialBruteforce {
                 DefaultWeightedEdge edge = graph.getEdge(node1, node2);
                 tour_length += graph.getEdgeWeight(edge);
             }
-            // int node1 = current_permutation.get(dimension - 1);
-            // int node2 = current_permutation.get(0);
-            // DefaultWeightedEdge edge = graph.getEdge(node1, node2);
-            // tour_length += graph.getEdgeWeight(edge);
+            int node1 = current_permutation.get(dimension - 1);
+            int node2 = current_permutation.get(0);
+            DefaultWeightedEdge edge = graph.getEdge(node1, node2);
+            tour_length += graph.getEdgeWeight(edge);
             if (tour_length < best_tour_length) {
                 best_tour_length = tour_length;
                 best_tour = (ArrayList<Integer>) current_permutation.clone();
+                // add the return home
+                best_tour.add(best_tour.get(0));
             }
             current_permutation = nextPermutation(current_permutation);
             if (current_permutation == null) {
                 break;
             }
         }
-        return best_tour;
+        long elapsed = System.currentTimeMillis() - start;
+
+        return new PathResult(best_tour, elapsed);
     }
 
     public static ArrayList<Integer> nextPermutation(ArrayList<Integer> permutation) {
