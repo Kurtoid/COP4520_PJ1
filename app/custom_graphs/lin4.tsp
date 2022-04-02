@@ -1,6 +1,6 @@
 NAME: lin105
 TYPE: TSP
-COMMENT: 105-city problem (Subproblem of lin318)
+COMMENT: 4-city problem (Subproblem of lin318)
 DIMENSION: 4
 EDGE_WEIGHT_TYPE: EUC_2D
 NODE_COORD_SECTION
