@@ -11,7 +11,7 @@ import tsp_demo2.algorithms.Bruteforce.SerialBruteforce;
 import tsp_demo2.graph.Graph;
 
 public class App {
-    static final int NUM_RUNS = 8;
+    static final int NUM_RUNS = 3;
     public static void main(String[] args) throws Exception {
         // print current resource path
         System.out.println(System.getProperty("user.dir"));
