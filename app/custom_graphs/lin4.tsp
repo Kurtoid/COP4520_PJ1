@@ -1,4 +1,4 @@
-NAME: lin105
+NAME: lin4
 TYPE: TSP
 COMMENT: 4-city problem (Subproblem of lin318)
 DIMENSION: 4

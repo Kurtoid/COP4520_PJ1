@@ -1,4 +1,4 @@
-NAME: lin105
+NAME: lin10
 TYPE: TSP
 COMMENT: 10-city problem (Subproblem of lin318)
 DIMENSION: 10
