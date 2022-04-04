@@ -32,7 +32,7 @@ public class SerialAntColony {
         ArrayList<Integer> tour = new ArrayList<>();
         double shortest_tour_length = Double.MAX_VALUE;
         // create a second graph to store the pheromone scores
-        SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = empty_jgraph_from_dimension(dimension);
+        SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = pheromone_jgraph(dimension);
         update_trails_from_greedy(g, dimension, pheromone_graph);
         // don't use g
         g = null;
@@ -140,7 +140,7 @@ public class SerialAntColony {
         return result;
     }
 
-    public static SimpleWeightedGraph<Integer, DefaultWeightedEdge> empty_jgraph_from_dimension(int dimension) {
+    public static SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_jgraph(int dimension) {
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = new SimpleWeightedGraph<>(
                 DefaultWeightedEdge.class);
         for (int i = 0; i < dimension; i++) {

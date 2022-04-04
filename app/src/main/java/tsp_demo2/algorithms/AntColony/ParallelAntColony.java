@@ -18,7 +18,7 @@ public class ParallelAntColony {
         long start = System.currentTimeMillis();
 
         SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = SerialAntColony
-                .empty_jgraph_from_dimension(dimension);
+                .pheromone_jgraph(dimension);
         SerialAntColony.update_trails_from_greedy(g, dimension, pheromone_graph);
         g = null;
         ArrayList<Integer> best_tour = null;
@@ -41,13 +41,6 @@ public class ParallelAntColony {
                     a.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
-            }
-            // get the best run
-            for (AntThread a : ants) {
-                if (a.tour_length < best_tour_length) {
-                    best_tour_length = a.tour_length;
-                    best_tour = a.tour;
                 }
             }
             // decay
@@ -119,30 +112,29 @@ public class ParallelAntColony {
                     double ph = ph_score.getEdgeWeight(pheromone_edge);
                     double score = SerialAntColony.edge_score(ph, dist);
 
-                        candidate_edges.add(edge);
-                        candidate_scores.add(score);
-                    }
-                    DefaultWeightedEdge chosen_edge = SerialAntColony.get_best_edge(candidate_edges, candidate_scores);
+                    candidate_edges.add(edge);
+                    candidate_scores.add(score);
+                }
+                DefaultWeightedEdge chosen_edge = SerialAntColony.get_best_edge(candidate_edges, candidate_scores);
 
-                    // get the vertex in edge that isn't current_node
-                    int lowest_score_index = graph.getEdgeTarget(chosen_edge);
-                    if (lowest_score_index == current_node) {
-                        lowest_score_index = graph.getEdgeSource(chosen_edge);
-                    }
-                    // add the lowest score node to the tour
-                    tour.add(lowest_score_index);
-                    // update the current node
-                    current_node = lowest_score_index;
+                // get the vertex in edge that isn't current_node
+                int lowest_score_index = graph.getEdgeTarget(chosen_edge);
+                if (lowest_score_index == current_node) {
+                    lowest_score_index = graph.getEdgeSource(chosen_edge);
+                }
+                // add the lowest score node to the tour
+                tour.add(lowest_score_index);
+                // update the current node
+                current_node = lowest_score_index;
 
-                    // update distance traveled
-                    double chosen_dist = graph.getEdgeWeight(chosen_edge);
-                    tour_length += chosen_dist;
+                // update distance traveled
+                double chosen_dist = graph.getEdgeWeight(chosen_edge);
+                tour_length += chosen_dist;
             }
             // add the edge from the last node to the first node
             tour_length += graph.getEdgeWeight(graph.getEdge(tour.get(tour.size() - 1), tour.get(0)));
 
         }
-
 
     }
 }

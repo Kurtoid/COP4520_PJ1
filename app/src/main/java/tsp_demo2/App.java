@@ -16,7 +16,7 @@ public class App {
         // print current resource path
         System.out.println(System.getProperty("user.dir"));
         // Graph g = Graph.from_tsplib("custom_graphs/lin10.tsp");
-        Graph g = Graph.from_tsplib("solved_graphs/kroD100.tsp");
+        Graph g = Graph.from_tsplib("solved_graphs/berlin52.tsp");
         // g.optimal_tour = Graph.read_tour("solved_graphs/berlin52.opt.tour");
         // System.out.printf("Optimal tour length: %f\n",
         // g.get_tour_length(g.optimal_tour));
