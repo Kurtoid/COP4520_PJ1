@@ -15,11 +15,11 @@ public class App {
     public static void main(String[] args) throws Exception {
         // print current resource path
         System.out.println(System.getProperty("user.dir"));
-        Graph g = Graph.from_tsplib("custom_graphs/lin10.tsp");
-        // Graph g = Graph.from_tsplib("solved_graphs/berlin52.tsp");
-        // g.optimal_tour = Graph.read_tour("solved_graphs/tsp225.opt.tour");
-        System.out.printf("Optimal tour length: %f\n",
-                g.get_tour_length(g.optimal_tour));
+        // Graph g = Graph.from_tsplib("custom_graphs/lin10.tsp");
+        Graph g = Graph.from_tsplib("solved_graphs/ch130.tsp");
+        // g.optimal_tour = Graph.read_tour("solved_graphs/berlin52.opt.tour");
+        // System.out.printf("Optimal tour length: %f\n",
+        // g.get_tour_length(g.optimal_tour));
         // System.out.println(g.optimal_tour);
 
         RunMetrics[] metrics = new RunMetrics[NUM_RUNS];
@@ -40,7 +40,7 @@ public class App {
 
         metrics = new RunMetrics[NUM_RUNS];
         for (int i = 0; i < NUM_RUNS; i++) {
-            PathResult ant_colony = SerialAntColony.find(g, 4, 5);
+            PathResult ant_colony = SerialAntColony.find(g, g.dimension / 2, 100);
             metrics[i] = new RunMetrics(ant_colony.time, g.get_tour_length(ant_colony.path));
         }
         avg_metrics = RunMetrics.getAvg(metrics);
@@ -48,13 +48,15 @@ public class App {
 
         metrics = new RunMetrics[NUM_RUNS];
         for (int i = 0; i < NUM_RUNS; i++) {
-            PathResult ant_colony = ParallelAntColony.find(g, 4, 5);
-            metrics[i] = new RunMetrics(ant_colony.time, g.get_tour_length(ant_colony.path));
+            PathResult ant_colony = ParallelAntColony.find(g, 5, 10);
+            metrics[i] = new RunMetrics(ant_colony.time,
+                    g.get_tour_length(ant_colony.path));
         }
         avg_metrics = RunMetrics.getAvg(metrics);
         System.out.println(avg_metrics.report("AntColony-Parallel"));
 
-        if (g.dimension < 12) {
+        if (g.dimension < 13) {
+            // TODO: optionally change the run count here
             metrics = new RunMetrics[NUM_RUNS];
             for (int i = 0; i < NUM_RUNS; i++) {
                 PathResult bruteforce = SerialBruteforce.find(g);
