@@ -32,31 +32,8 @@ public class SerialAntColony {
         ArrayList<Integer> tour = new ArrayList<>();
         double shortest_tour_length = Double.MAX_VALUE;
         // create a second graph to store the pheromone scores
-        SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = new SimpleWeightedGraph<>(
-                DefaultWeightedEdge.class);
-        for (int i = 0; i < dimension; i++) {
-            pheromone_graph.addVertex(i + 1);
-        }
-        // fully connected graph - only need to add edges in one direction since it's
-        // undirected
-        for (int i = 0; i < dimension; i++) {
-            for (int j = i + 1; j < dimension; j++) {
-                DefaultWeightedEdge e = pheromone_graph.addEdge(i + 1, j + 1);
-                pheromone_graph.setEdgeWeight(e, Q);
-            }
-        }
-        {
-            // initialize the pheromone score with a nearest neighbor tour
-            ArrayList<Integer> nearest_neighbors = GreedyNearest.find(g).path;
-            double nearest_tour_length = g.get_tour_length(nearest_neighbors);
-            double contrib = Q / nearest_tour_length;
-            for (int i = 0; i < dimension; i++) {
-                int node = nearest_neighbors.get(i);
-                int next_node = nearest_neighbors.get((i + 1) % dimension);
-                DefaultWeightedEdge e = pheromone_graph.getEdge(node, next_node);
-                pheromone_graph.setEdgeWeight(e, pheromone_graph.getEdgeWeight(e) + contrib);
-            }
-        }
+        SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = empty_jgraph_from_dimension(dimension);
+        update_trails_from_greedy(g, dimension, pheromone_graph);
         // don't use g
         g = null;
         int steps_since_last_improvement = 0;
@@ -161,6 +138,39 @@ public class SerialAntColony {
         long elapsed = System.currentTimeMillis() - start;
         PathResult result = new PathResult(tour, elapsed);
         return result;
+    }
+
+    public static SimpleWeightedGraph<Integer, DefaultWeightedEdge> empty_jgraph_from_dimension(int dimension) {
+        SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph = new SimpleWeightedGraph<>(
+                DefaultWeightedEdge.class);
+        for (int i = 0; i < dimension; i++) {
+            pheromone_graph.addVertex(i + 1);
+        }
+        // fully connected graph - only need to add edges in one direction since it's
+        // undirected
+        for (int i = 0; i < dimension; i++) {
+            for (int j = i + 1; j < dimension; j++) {
+                DefaultWeightedEdge e = pheromone_graph.addEdge(i + 1, j + 1);
+                pheromone_graph.setEdgeWeight(e, Q);
+            }
+        }
+        return pheromone_graph;
+    }
+
+    public static void update_trails_from_greedy(Graph g, int dimension,
+            SimpleWeightedGraph<Integer, DefaultWeightedEdge> pheromone_graph) {
+        {
+            // initialize the pheromone score with a nearest neighbor tour
+            ArrayList<Integer> nearest_neighbors = GreedyNearest.find(g).path;
+            double nearest_tour_length = g.get_tour_length(nearest_neighbors);
+            double contrib = Q / nearest_tour_length;
+            for (int i = 0; i < dimension; i++) {
+                int node = nearest_neighbors.get(i);
+                int next_node = nearest_neighbors.get((i + 1) % dimension);
+                DefaultWeightedEdge e = pheromone_graph.getEdge(node, next_node);
+                pheromone_graph.setEdgeWeight(e, pheromone_graph.getEdgeWeight(e) + contrib);
+            }
+        }
     }
 
     public static DefaultWeightedEdge get_best_edge(List<DefaultWeightedEdge> candidate_edges,

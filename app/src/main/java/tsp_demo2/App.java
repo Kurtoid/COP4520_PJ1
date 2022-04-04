@@ -16,7 +16,7 @@ public class App {
         // print current resource path
         System.out.println(System.getProperty("user.dir"));
         // Graph g = Graph.from_tsplib("custom_graphs/lin10.tsp");
-        Graph g = Graph.from_tsplib("solved_graphs/ch130.tsp");
+        Graph g = Graph.from_tsplib("solved_graphs/kroD100.tsp");
         // g.optimal_tour = Graph.read_tour("solved_graphs/berlin52.opt.tour");
         // System.out.printf("Optimal tour length: %f\n",
         // g.get_tour_length(g.optimal_tour));
@@ -48,7 +48,7 @@ public class App {
 
         metrics = new RunMetrics[NUM_RUNS];
         for (int i = 0; i < NUM_RUNS; i++) {
-            PathResult ant_colony = ParallelAntColony.find(g, 5, 10);
+            PathResult ant_colony = ParallelAntColony.find(g, g.dimension / 2, 100);
             metrics[i] = new RunMetrics(ant_colony.time,
                     g.get_tour_length(ant_colony.path));
         }
