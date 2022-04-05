@@ -29,7 +29,7 @@ public class ParallelAntColony {
             for (int j = 0; j < num_ants; j++) {
                 AntThread a = new AntThread();
                 a.graph = (SimpleWeightedGraph<Integer, DefaultWeightedEdge>) graph;
-                a.ph_score = pheromone_graph;
+                a.ph_score = (SimpleWeightedGraph<Integer, DefaultWeightedEdge>) pheromone_graph;
                 ants.add(a);
             }
             // run all ants, and wait for them to finish
@@ -44,10 +44,10 @@ public class ParallelAntColony {
                 }
             }
             // decay
-            for (DefaultWeightedEdge e : pheromone_graph.edgeSet()) {
-                pheromone_graph.setEdgeWeight(e, pheromone_graph.getEdgeWeight(e) * SerialAntColony.evaporation);
-            }
             for (int j = 0; j < num_ants; j++) {
+                for (DefaultWeightedEdge e : pheromone_graph.edgeSet()) {
+                    pheromone_graph.setEdgeWeight(e, pheromone_graph.getEdgeWeight(e) * SerialAntColony.evaporation);
+                }
                 ArrayList<Integer> tour = ants.get(j).tour;
                 double tour_length = ants.get(j).tour_length;
                 double contrib = SerialAntColony.Q / tour_length;
@@ -66,7 +66,7 @@ public class ParallelAntColony {
                 }
             }
             steps_since_last_improvement++;
-            if (steps_since_last_improvement > 5) {
+            if (steps_since_last_improvement > 10) {
                 break;
             }
         }
@@ -83,13 +83,14 @@ public class ParallelAntColony {
         public SimpleWeightedGraph<Integer, DefaultWeightedEdge> ph_score;
         public ArrayList<Integer> tour;
 
-        public double tour_length;
+        public double tour_length = 0.0;
 
         public void run() {
             int current_node = (int) (Math.random() * graph.vertexSet().size()) + 1;
             tour = new ArrayList<>();
             tour.add(current_node);
             int dimension = graph.vertexSet().size();
+            tour_length = 0.0;
             while (tour.size() < dimension) {
                 // get the edges from the current node
                 // warning: edges may be in opposite order!
@@ -131,8 +132,6 @@ public class ParallelAntColony {
                 double chosen_dist = graph.getEdgeWeight(chosen_edge);
                 tour_length += chosen_dist;
             }
-            // add the edge from the last node to the first node
-            tour_length += graph.getEdgeWeight(graph.getEdge(tour.get(tour.size() - 1), tour.get(0)));
 
         }
 

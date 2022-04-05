@@ -1,8 +1,6 @@
 package tsp_demo2.algorithms.Bruteforce;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.jgrapht.graph.DefaultWeightedEdge;

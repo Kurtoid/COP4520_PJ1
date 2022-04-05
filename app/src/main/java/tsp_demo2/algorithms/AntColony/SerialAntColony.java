@@ -105,22 +105,15 @@ public class SerialAntColony {
                 // deposit along the path taken
                 double contrib = Q / this_tour_length;
                 contrib /= n_ants;
-                for (int k = 0; k < this_tour.size() - 1; k++) {
+                for (int k = 0; k < this_tour.size(); k++) {
                     int node1 = this_tour.get(k);
-                    int node2 = this_tour.get(k + 1);
+                    int node2 = this_tour.get((k + 1) % this_tour.size());
                     DefaultWeightedEdge edge = pheromone_graph.getEdge(node1, node2);
                     double ph = pheromone_graph.getEdgeWeight(edge);
                     ph += contrib;
                     pheromone_graph.setEdgeWeight(edge, ph);
                 }
 
-                // last node to start node
-                int node1 = this_tour.get(this_tour.size() - 1);
-                int node2 = this_tour.get(0);
-                DefaultWeightedEdge edge = pheromone_graph.getEdge(node1, node2);
-                double ph = pheromone_graph.getEdgeWeight(edge);
-                ph += contrib;
-                pheromone_graph.setEdgeWeight(edge, ph);
 
                 // is this tour shorter than the shortest tour?
                 if (this_tour_length < shortest_tour_length) {
@@ -131,7 +124,7 @@ public class SerialAntColony {
             }
             steps_since_last_improvement++;
             // System.out.println("Iteration " + i + ": " + shortest_tour_length);
-            if (steps_since_last_improvement > 5) {
+            if (steps_since_last_improvement > 10) {
                 break;
             }
         }
